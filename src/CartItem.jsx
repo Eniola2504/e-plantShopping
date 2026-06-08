@@ -3,14 +3,22 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeItem, updateQuantity } from "./CartSlice";
 import "./CartItem.css";
 
-const CartItem = ({ onContinueShopping }) => {
+const CartItem = ({ onContinueShopping, showCart, setShowCart }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
 
   // Calculate total amount for all products in the cart
-  const calculateTotalAmount = () => {};
+  const calculateTotalAmount = () => {
+    return cart
+      .reduce((total, item) => {
+        return total + item.cost * item.quantity;
+      }, 0)
+      .toFixed(2); // Return total amount with 2 decimal places
+  };
 
-  const handleContinueShopping = e => {};
+  const handleContinueShopping = e => {
+    setShowCart(false);
+  };
 
   const handleIncrement = item => {
     dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1 }));
@@ -29,7 +37,10 @@ const CartItem = ({ onContinueShopping }) => {
   };
 
   // Calculate total cost based on quantity for an item
-  const calculateTotalCost = item => {};
+  const calculateTotalCost = item => {
+    const { cost, quantity } = item;
+    return (cost * quantity).toFixed(2); // Return total cost with 2 decimal places
+  };
 
   return (
     <div className="cart-container">
@@ -42,7 +53,7 @@ const CartItem = ({ onContinueShopping }) => {
             <img className="cart-item-image" src={item.image} alt={item.name} />
             <div className="cart-item-details">
               <div className="cart-item-name">{item.name}</div>
-              <div className="cart-item-cost">{item.cost}</div>
+              <div className="cart-item-cost">${item.cost.toFixed(2)}</div>
               <div className="cart-item-quantity">
                 <button
                   className="cart-item-button cart-item-button-dec"
@@ -76,7 +87,9 @@ const CartItem = ({ onContinueShopping }) => {
       <div
         style={{ marginTop: "20px", color: "black" }}
         className="total_cart_amount"
-      ></div>
+      >
+        Total Cart Amount: ${calculateTotalAmount()}
+      </div>
       <div className="continue_shopping_btn">
         <button
           className="get-started-button"
